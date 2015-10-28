@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/header_height"
+        android:layout_alignParentTop="true"
+        android:id="@+id/header">
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/ivUserProfile"
+            android:layout_width="@dimen/profile_image_width"
+            android:layout_height="@dimen/profile_image_width"
+            android:layout_gravity="center_vertical"
+            fresco:roundAsCircle="true"
+            fresco:placeholderImage="@drawable/ic_profile"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvUserName"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/blue_text"
+            android:typeface="sans"
+            android:textStyle="bold"
+            android:layout_toRightOf="@+id/ivUserProfile"
+            android:layout_marginLeft="8dp"
+            android:textSize="@dimen/default_text_size" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvTime"
+            android:typeface="sans"
+            android:layout_toLeftOf="@id/tvUserName"
+            android:layout_gravity="center_vertical"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:textSize="@dimen/default_text_size"
+            android:textColor="@color/light_gray_text" />
+    </RelativeLayout>
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/my_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/header"
+        fresco:placeholderImage="@drawable/ic_defaultpostpic"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvLikes"
+        android:layout_below="@+id/my_image_view"
+        android:drawableLeft="@drawable/ic_heart"
+        android:drawablePadding="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="4dp"
+        android:typeface="sans"
+        android:textColor="@color/blue_text"
+        android:textSize="@dimen/default_text_size"
+        android:textStyle="bold"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvCaption"
+        android:textSize="@dimen/default_text_size"
+        android:typeface="sans"
+        android:layout_below="@+id/tvLikes"
+        />
+</RelativeLayout>
