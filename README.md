@@ -24,6 +24,7 @@ Optional Features to be added in future
 Here's a walkthrough of implemented user stories:
 Located at
 app/src/main/res/drawable/instagramday1.gif
+https://github.com/prajaa/MyInstagramClient/blob/master/app/src/main/res/drawable/instagramday1.gif
 
 
 
