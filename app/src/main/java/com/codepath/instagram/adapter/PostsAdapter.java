@@ -1,7 +1,6 @@
 package com.codepath.instagram.adapter;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
@@ -9,16 +8,16 @@ import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.text.style.TypefaceSpan;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.codepath.instagram.R;
 import com.codepath.instagram.helpers.Utils;
+import com.codepath.instagram.models.InstagramComment;
 import com.codepath.instagram.models.InstagramPost;
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -32,7 +31,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
     List<InstagramPost> mPosts;
     Context context;
-    float aspectRatio;
 
     public PostsAdapter(List<InstagramPost> posts) {
         this.mPosts = posts;
@@ -42,9 +40,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     public PostViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-
-//        parent.getWidth();
-  //      aspectRatio = parent.getWidth()
         PostViewHolder holder = new PostViewHolder(inflater.inflate(R.layout.item_post, parent, false));
         return holder;
     }
@@ -58,13 +53,55 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         holder.mainImage.setImageURI(Uri.parse(post.image.imageUrl));
         holder.mainImage.setAspectRatio(1);
         holder.tvLikes.setText(Utils.formatNumberForDisplay(post.likesCount) + " likes");
-        Log.i("PRAJ",DateUtils.getRelativeTimeSpanString(post.createdTime * 1000, System.currentTimeMillis(),DateUtils.HOUR_IN_MILLIS).toString());
-        holder.tvTime.setText(DateUtils.getRelativeTimeSpanString(post.createdTime * 1000, System.currentTimeMillis(),DateUtils.SECOND_IN_MILLIS));
-        styleCaptions(post.user.userName, post.caption, holder);
+        Log.i("PRAJ", DateUtils.getRelativeTimeSpanString(post.createdTime * 1000, System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS).toString());
+        holder.tvTime.setText(DateUtils.getRelativeTimeSpanString(post.createdTime * 1000, System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
+        styleText(post.user.userName, post.caption, holder.tvCaption);
+        insertComments(holder, post.comments, post.commentsCount);
 
     }
 
-    public void styleCaptions(String username, String caption, PostViewHolder holder) {
+    private void insertComments(PostViewHolder holder, List<InstagramComment> comments, int commentCount) {
+        holder.llComents.removeAllViews();
+        String userName, userComment;
+        TextView commentView;
+        holder.llComents.removeAllViews();
+        switch (commentCount) {
+            case 0: holder.llComents.setVisibility(View.GONE); break;
+            case 1:
+                userName = comments.get(0).user.userName;
+                userComment = comments.get(0).text;
+                commentView = (TextView) LayoutInflater.from(context).inflate(R.layout.layout_item_text_comment, holder.llComents, false).findViewById(R.id.tvComment);
+                styleText(userName, userComment, commentView);
+                holder.llComents.addView(commentView);
+                break;
+            case 2:
+                commentView = (TextView) LayoutInflater.from(context).inflate(R.layout.layout_item_text_comment, holder.llComents, false).findViewById(R.id.tvComment);
+                for (InstagramComment comment : comments) {
+                    userName = comment.user.userName;
+                    userComment = comment.text;
+                    commentView = styleText(userName, userComment, commentView);
+                    holder.llComents.addView(commentView);
+                }
+                break;
+            default:
+                holder.llComents.removeAllViews();
+                for (int i = 0 ; i < 2; i++) {
+                    commentView = (TextView) LayoutInflater.from(context).inflate(R.layout.layout_item_text_comment, holder.llComents, false);
+                    userName = comments.get(i).user.userName;
+                    userComment = comments.get(i).text;
+                    commentView = styleText(userName, userComment, commentView);
+                    holder.llComents.addView(commentView);
+                }
+                break;
+        }
+
+    }
+
+    /**
+     * General method to style text in the format <BLUE>Username</BLUE>  <GRAY>Rest of the Text</GRAY>
+     * */
+    public TextView styleText(String username, String caption, TextView textView) {
+
         ForegroundColorSpan blueForegroundColorSpan = new ForegroundColorSpan(context.getResources().getColor(R.color.blue_text));
         StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD);
         SpannableStringBuilder ssb = new SpannableStringBuilder(username);
@@ -84,12 +121,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                     // the start of the span (inclusive)
                     ssb.length(),                      // the end of the span (exclusive)
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            holder.tvCaption.setText(ssb);
+            textView.setText(ssb);
         } else {
-            holder.tvCaption.setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
         }
 
-
+        return textView;
 
     }
 
@@ -102,6 +139,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         TextView tvUserName, tvLikes, tvCaption, tvTime;
         SimpleDraweeView mainImage, profileImage;
+        LinearLayout llComents;
 
         public PostViewHolder(View layoutView) {
             super(layoutView);
@@ -111,6 +149,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             tvTime = (TextView) layoutView.findViewById(R.id.tvTime);
             mainImage = (SimpleDraweeView) layoutView.findViewById(R.id.my_image_view);
             profileImage = (SimpleDraweeView) layoutView.findViewById(R.id.ivUserProfile);
+            llComents = (LinearLayout) layoutView.findViewById(R.id.llcomments);
         }
     }
 

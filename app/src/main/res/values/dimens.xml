@@ -6,4 +6,5 @@
     <dimen name="profile_image_height">30dp</dimen>
     <dimen name="header_height">52dp</dimen>
     <dimen name="default_text_size">14sp</dimen>
+    <dimen name="footer_items_size">22dp</dimen>
 </resources>
