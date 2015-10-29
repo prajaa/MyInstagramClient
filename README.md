@@ -28,10 +28,13 @@ Optional Features to be added in future
 
 Here's a walkthrough of implemented user stories:
 Located at
+
+https://github.com/prajaa/MyInstagramClient/blob/master/app/src/main/res/drawable/day2.gif
+
 app/src/main/res/drawable/instagramday1.gif
 https://github.com/prajaa/MyInstagramClient/blob/master/app/src/main/res/drawable/instagramday1.gif
 
-https://github.com/prajaa/MyInstagramClient/blob/master/app/src/main/res/drawable/day2.gif
+
 
 
 
