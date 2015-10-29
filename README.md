@@ -16,6 +16,11 @@ The following **required** functionality is completed:
   Relative timestamp, Like count
   Display each user profile image as a circle.
   Display a nice default placeholder graphic for each image during loading.
+* Connect the app with the Instagram API and get real time data using async-http-client library.
+* Show the last 2 comments for each photo.
+* User can view all comments for a post within a separate activity.
+* User can share an image to their friends or email to themselves.
+* Robust error handling, check if internet is available, handle network failures.
 
 Optional Features to be added in future
 
@@ -25,6 +30,8 @@ Here's a walkthrough of implemented user stories:
 Located at
 app/src/main/res/drawable/instagramday1.gif
 https://github.com/prajaa/MyInstagramClient/blob/master/app/src/main/res/drawable/instagramday1.gif
+
+https://github.com/prajaa/MyInstagramClient/blob/master/app/src/main/res/drawable/day2.gif
 
 
 
