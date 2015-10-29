@@ -1,16 +1,19 @@
 package com.codepath.instagram.activities;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.codepath.instagram.R;
 import com.codepath.instagram.adapter.PostsAdapter;
+import com.codepath.instagram.fragments.NetworkDialogFragment;
 import com.codepath.instagram.helpers.InstagramClient;
 import com.codepath.instagram.helpers.SimpleVerticalSpacerItemDecoration;
 import com.codepath.instagram.helpers.Utils;
@@ -77,7 +80,20 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String res, Throwable t) {
+                super.onFailure(statusCode, headers, res, t);
+                NetworkDialogFragment networkDialogFragment = new NetworkDialogFragment();
+                FragmentManager fm = getFragmentManager();
+                networkDialogFragment.show(fm, "Network Dialog");
+                Log.i(TAG,"Reaching network error");
                 Toast.makeText(getBaseContext(), "FAIL", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                NetworkDialogFragment networkDialogFragment = new NetworkDialogFragment();
+                FragmentManager fm = getFragmentManager();
+                networkDialogFragment.show(fm, "Network Dialog");
             }
         });
 

@@ -1,7 +1,12 @@
 package com.codepath.instagram.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -10,16 +15,30 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.codepath.instagram.R;
+import com.codepath.instagram.activities.CommentsActivity;
+import com.codepath.instagram.activities.HomeActivity;
 import com.codepath.instagram.helpers.Utils;
 import com.codepath.instagram.models.InstagramComment;
 import com.codepath.instagram.models.InstagramPost;
+import com.facebook.common.executors.CallerThreadExecutor;
+import com.facebook.common.references.CloseableReference;
+import com.facebook.datasource.DataSource;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.common.Priority;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import java.util.List;
 
@@ -55,23 +74,32 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         holder.tvLikes.setText(Utils.formatNumberForDisplay(post.likesCount) + " likes");
         Log.i("PRAJ", DateUtils.getRelativeTimeSpanString(post.createdTime * 1000, System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS).toString());
         holder.tvTime.setText(DateUtils.getRelativeTimeSpanString(post.createdTime * 1000, System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
-        styleText(post.user.userName, post.caption, holder.tvCaption);
-        insertComments(holder, post.comments, post.commentsCount);
+
+        if (post.commentsCount > 2) {
+            holder.tvViewAllComment.setText("View all "+post.commentsCount+" comments");
+            holder.tvViewAllComment.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvViewAllComment.setVisibility(View.GONE);
+        }
+
+        Utils.styleText(post.user.userName, post.caption, holder.tvCaption, context);
+
+        insertComments(holder, post.comments);
 
     }
 
-    private void insertComments(PostViewHolder holder, List<InstagramComment> comments, int commentCount) {
+    private void insertComments(PostViewHolder holder, List<InstagramComment> comments) {
         holder.llComents.removeAllViews();
         String userName, userComment;
         TextView commentView;
         holder.llComents.removeAllViews();
-        switch (commentCount) {
+        switch (comments.size()) {
             case 0: holder.llComents.setVisibility(View.GONE); break;
             case 1:
                 userName = comments.get(0).user.userName;
                 userComment = comments.get(0).text;
                 commentView = (TextView) LayoutInflater.from(context).inflate(R.layout.layout_item_text_comment, holder.llComents, false).findViewById(R.id.tvComment);
-                styleText(userName, userComment, commentView);
+                Utils.styleText(userName, userComment, commentView, context);
                 holder.llComents.addView(commentView);
                 break;
             case 2:
@@ -79,7 +107,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                 for (InstagramComment comment : comments) {
                     userName = comment.user.userName;
                     userComment = comment.text;
-                    commentView = styleText(userName, userComment, commentView);
+                    commentView = Utils.styleText(userName, userComment, commentView, context);
                     holder.llComents.addView(commentView);
                 }
                 break;
@@ -89,7 +117,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                     commentView = (TextView) LayoutInflater.from(context).inflate(R.layout.layout_item_text_comment, holder.llComents, false);
                     userName = comments.get(i).user.userName;
                     userComment = comments.get(i).text;
-                    commentView = styleText(userName, userComment, commentView);
+                    commentView = Utils.styleText(userName, userComment, commentView, context);
                     holder.llComents.addView(commentView);
                 }
                 break;
@@ -99,7 +127,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
     /**
      * General method to style text in the format <BLUE>Username</BLUE>  <GRAY>Rest of the Text</GRAY>
-     * */
+     *
     public TextView styleText(String username, String caption, TextView textView) {
 
         ForegroundColorSpan blueForegroundColorSpan = new ForegroundColorSpan(context.getResources().getColor(R.color.blue_text));
@@ -129,17 +157,80 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         return textView;
 
     }
-
+*/
     @Override
     public int getItemCount() {
         return mPosts.size();
     }
 
-    public static class PostViewHolder extends RecyclerView.ViewHolder {
+    public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView tvUserName, tvLikes, tvCaption, tvTime;
+        TextView tvUserName, tvLikes, tvCaption, tvTime, tvViewAllComment;
         SimpleDraweeView mainImage, profileImage;
         LinearLayout llComents;
+        ImageButton ibShare;
+
+        public void showPopUp(final String imageUrl, View v) {
+
+            PopupMenu popup = new PopupMenu(context, v);
+            // Inflate the menu from xml
+            popup.getMenuInflater().inflate(R.menu.post_dots, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    if (item.getItemId() == R.id.mShare) {
+                        Uri imageUri = Uri.parse(imageUrl);
+
+                        ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                        ImageRequest imageRequest = ImageRequestBuilder
+                                .newBuilderWithSource(imageUri)
+                                .setRequestPriority(Priority.HIGH)
+                                .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+                                .build();
+
+                        DataSource<CloseableReference<CloseableImage>> dataSource =
+                                imagePipeline.fetchDecodedImage(imageRequest, context);
+
+                        try {
+                            dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                                @Override
+                                public void onNewResultImpl(@Nullable Bitmap bitmap) {
+                                    if (bitmap == null) {
+                                        Log.d("PRAJ", "Bitmap data source returned success, but bitmap null.");
+                                        return;
+                                    }
+                                    String path = MediaStore.Images.Media.insertImage(context.getContentResolver(),
+                                            bitmap, "Image Description", null);
+                                    Uri bmpUri = Uri.parse(path);
+                                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                                    shareIntent.putExtra(Intent.EXTRA_STREAM, bmpUri);
+                                    shareIntent.setType("image/*");
+
+                                    context.startActivity(Intent.createChooser(shareIntent, "Share Image"));
+                                }
+
+                                @Override
+                                public void onFailureImpl(DataSource dataSource) {
+                                    // No cleanup required here
+                                }
+                            }, CallerThreadExecutor.getInstance());
+                        } finally {
+                            if (dataSource != null) {
+                                dataSource.close();
+                            }
+                        }
+                    }
+                    return true;
+                }
+            });
+
+            popup.show();
+
+
+
+
+        }
 
         public PostViewHolder(View layoutView) {
             super(layoutView);
@@ -150,6 +241,29 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             mainImage = (SimpleDraweeView) layoutView.findViewById(R.id.my_image_view);
             profileImage = (SimpleDraweeView) layoutView.findViewById(R.id.ivUserProfile);
             llComents = (LinearLayout) layoutView.findViewById(R.id.llcomments);
+            tvViewAllComment = (TextView) layoutView.findViewById(R.id.tvViewAllComments);
+            ibShare = (ImageButton) layoutView.findViewById(R.id.ibShare);
+            ibShare.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getLayoutPosition();
+                    showPopUp(mPosts.get(position).image.imageUrl, v);
+                }
+            });
+            tvViewAllComment.setOnClickListener(this);
+
+
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getLayoutPosition();
+            InstagramPost post = mPosts.get(position);
+            String mediaId = post.mediaId;
+            Intent intent = new Intent(context, CommentsActivity.class);
+            intent.putExtra("mediaId", mediaId);
+            context.startActivity(intent);
+
         }
     }
 

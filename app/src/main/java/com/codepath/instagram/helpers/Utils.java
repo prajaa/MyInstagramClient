@@ -1,7 +1,14 @@
 package com.codepath.instagram.helpers;
 
 import android.content.Context;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
+import android.view.View;
+import android.widget.TextView;
 
+import com.codepath.instagram.R;
 import com.codepath.instagram.models.InstagramComment;
 import com.codepath.instagram.models.InstagramPost;
 import com.codepath.instagram.models.InstagramSearchTag;
@@ -77,5 +84,39 @@ public class Utils {
             jsonArray = jsonObject.optJSONArray("data");
         }
         return jsonArray;
+    }
+
+
+    /**
+     * General method to style text in the format <BLUE>Username</BLUE>  <GRAY>Rest of the Text</GRAY>
+     * */
+    public static TextView styleText(String username, String caption, TextView textView, Context context) {
+
+        ForegroundColorSpan blueForegroundColorSpan = new ForegroundColorSpan(context.getResources().getColor(R.color.blue_text));
+        StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD);
+        SpannableStringBuilder ssb = new SpannableStringBuilder(username);
+        ssb.setSpan(
+                blueForegroundColorSpan,            // the span to add
+                0,                                 // the start of the span (inclusive)
+                ssb.length(),                      // the end of the span (exclusive)
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssb.setSpan(bss, 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssb.append(" ");
+        ForegroundColorSpan grayColorSpan = new ForegroundColorSpan(context.getResources().getColor(R.color.gray_text));
+        if (caption != null) {
+            ssb.append(caption);
+            ssb.setSpan(
+                    grayColorSpan,            // the span to add
+                    ssb.length() - caption.length(),
+                    // the start of the span (inclusive)
+                    ssb.length(),                      // the end of the span (exclusive)
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            textView.setText(ssb);
+        } else {
+            textView.setVisibility(View.GONE);
+        }
+
+        return textView;
+
     }
 }
