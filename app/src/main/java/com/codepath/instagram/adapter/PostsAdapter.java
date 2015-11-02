@@ -98,13 +98,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             case 1:
                 userName = comments.get(0).user.userName;
                 userComment = comments.get(0).text;
-                commentView = (TextView) LayoutInflater.from(context).inflate(R.layout.layout_item_text_comment, holder.llComents, false).findViewById(R.id.tvComment);
+                commentView = (TextView) LayoutInflater.from(context).inflate(R.layout.layout_item_text_comment, holder.llComents, false);
+                holder.llComents.removeAllViews();
                 Utils.styleText(userName, userComment, commentView, context);
                 holder.llComents.addView(commentView);
                 break;
             case 2:
-                commentView = (TextView) LayoutInflater.from(context).inflate(R.layout.layout_item_text_comment, holder.llComents, false).findViewById(R.id.tvComment);
+
+                holder.llComents.removeAllViews();
                 for (InstagramComment comment : comments) {
+                    commentView = (TextView) LayoutInflater.from(context).inflate(R.layout.layout_item_text_comment, holder.llComents, false);
                     userName = comment.user.userName;
                     userComment = comment.text;
                     commentView = Utils.styleText(userName, userComment, commentView, context);

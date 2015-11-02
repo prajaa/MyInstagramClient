@@ -1,18 +1,26 @@
 package com.codepath.instagram.helpers;
 
+import android.app.FragmentManager;
 import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codepath.instagram.R;
+import com.codepath.instagram.adapter.PostsAdapter;
+import com.codepath.instagram.fragments.NetworkDialogFragment;
 import com.codepath.instagram.models.InstagramComment;
 import com.codepath.instagram.models.InstagramPost;
 import com.codepath.instagram.models.InstagramSearchTag;
 import com.codepath.instagram.models.InstagramUser;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,6 +33,8 @@ import java.io.InputStreamReader;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+//import cz.msebera.android.httpclient.Header;
 
 public class Utils {
     private static final String TAG = "Utils";
@@ -119,4 +129,9 @@ public class Utils {
         return textView;
 
     }
+
+
+
+
+
 }

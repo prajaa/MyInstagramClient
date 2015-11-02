@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Instagram</string>
+    <string name="app_name">PrajInstagram</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -10,4 +10,7 @@
     <string name="network_error_title">Network Error</string>
     <string name="network_error_message">Please check your internet network and try again</string>
     <string name="cancel">Cancel</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="users">USERS</string>
+    <string name="tags">TAGS</string>
 </resources>

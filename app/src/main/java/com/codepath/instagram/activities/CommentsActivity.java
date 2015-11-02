@@ -18,11 +18,13 @@ import com.codepath.instagram.helpers.Utils;
 import com.codepath.instagram.models.InstagramComment;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.apache.http.Header;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
+//import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by prajakta on 10/29/15.
@@ -47,7 +49,10 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     private List<InstagramComment> getComments() {
-        InstagramClient.getCommentsFeed(new JsonHttpResponseHandler() {
+        InstagramClient instagramClient = new InstagramClient(context);
+        instagramClient.getCommentsFeed(new JsonHttpResponseHandler() {
+
+
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
