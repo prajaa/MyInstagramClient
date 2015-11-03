@@ -68,6 +68,7 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    /*
     public List<InstagramPost> getPosts() {
        /*
        Day 1
@@ -79,7 +80,7 @@ public class HomeActivity extends AppCompatActivity {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } */
+        }
 
         //Day 2 - Fetch the Posts from Instagram API
         //Day 3 - change the Instagram client to be a Rest client
@@ -122,7 +123,7 @@ public class HomeActivity extends AppCompatActivity {
 
         return posts;
     }
-
+*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

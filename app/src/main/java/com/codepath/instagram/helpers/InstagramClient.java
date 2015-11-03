@@ -8,6 +8,8 @@ import com.codepath.oauth.OAuthAsyncHttpClient;
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.SyncHttpClient;
 
 import org.scribe.builder.api.Api;
 import org.scribe.model.Token;
@@ -35,6 +37,8 @@ public class InstagramClient extends OAuthBaseClient {
     public static final String REST_CALLBACK_URL = Constants.REDIRECT_URI;
     public static final String REDIRECT_URI = Constants.REDIRECT_URI;
     public static final String SCOPE = Constants.SCOPE;
+    private AsyncHttpClient mSyncClient = new SyncHttpClient();
+
 
 
     private static final String CLIENT_ID = "4280c802ff114fe9a8fbee03fd0c0dc7";
@@ -50,7 +54,11 @@ public class InstagramClient extends OAuthBaseClient {
     }
 
     public void getSelfFeed(JsonHttpResponseHandler responseHandler) {
-        client.get(REST_URL + SELF_FEED_URL, null, responseHandler);
+        RequestParams params = new RequestParams();
+        params.put("access_token", client.getAccessToken().getToken());
+        mSyncClient.get(REST_URL + SELF_FEED_URL, params, responseHandler);
+       // client.get(REST_URL + SELF_FEED_URL, params, responseHandler);
+        //client.get(REST_URL + SELF_FEED_URL, null, responseHandler);
     }
 
     public void getCommentsFeed(JsonHttpResponseHandler responseHandler, String mediaId) {

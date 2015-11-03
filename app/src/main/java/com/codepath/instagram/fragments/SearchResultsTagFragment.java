@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.codepath.instagram.R;
 import com.codepath.instagram.adapter.SearchTagResultsAdapter;
 import com.codepath.instagram.adapter.SearchUserResultAdapter;
+import com.codepath.instagram.core.MainApplication;
 import com.codepath.instagram.helpers.InstagramClient;
 import com.codepath.instagram.helpers.Utils;
 import com.codepath.instagram.models.InstagramSearchTag;
@@ -33,7 +34,7 @@ public class SearchResultsTagFragment extends SearchResultsFragment {
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                InstagramClient instagramClient = new InstagramClient(mContext);
+                InstagramClient instagramClient = MainApplication.getInstagramClient();
               //  progress.setVisibility(ProgressBar.VISIBLE);
                 instagramClient.getTagSearchFeed(new JsonHttpResponseHandler() {
 

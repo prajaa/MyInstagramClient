@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
@@ -40,6 +41,7 @@ import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -51,8 +53,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     List<InstagramPost> mPosts;
     Context context;
 
-    public PostsAdapter(List<InstagramPost> posts) {
-        this.mPosts = posts;
+
+
+    public PostsAdapter() {
+        mPosts = new ArrayList<InstagramPost>();
     }
 
     @Override
@@ -60,6 +64,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         PostViewHolder holder = new PostViewHolder(inflater.inflate(R.layout.item_post, parent, false));
+
         return holder;
     }
 
@@ -84,9 +89,24 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         Utils.styleText(post.user.userName, post.caption, holder.tvCaption, context);
 
-        insertComments(holder, post.comments);
+        if ( post.comments != null && post.comments.size() > 0)
+            insertComments(holder, post.comments);
 
     }
+
+    public void clear() {
+        if (mPosts != null) {
+            mPosts.clear();
+            notifyDataSetChanged();
+        }
+    }
+
+    // Add a list of items
+    public void addAll(List<InstagramPost> posts) {
+        mPosts.addAll(posts);
+        notifyDataSetChanged();
+    }
+
 
     private void insertComments(PostViewHolder holder, List<InstagramComment> comments) {
         holder.llComents.removeAllViews();
@@ -163,7 +183,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 */
     @Override
     public int getItemCount() {
-        return mPosts.size();
+        if (mPosts != null)
+            return mPosts.size();
+        else
+            return 0;
     }
 
     public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
