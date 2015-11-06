@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +22,7 @@ import com.codepath.instagram.adapter.HomeFragmentStatePagerAdapter;
 import com.codepath.instagram.adapter.PostsAdapter;
 import com.codepath.instagram.fragments.NetworkDialogFragment;
 import com.codepath.instagram.fragments.PostsFragment;
+import com.codepath.instagram.fragments.ProfileFragment;
 import com.codepath.instagram.helpers.InstagramClient;
 import com.codepath.instagram.helpers.SimpleVerticalSpacerItemDecoration;
 import com.codepath.instagram.helpers.Utils;
@@ -35,7 +37,7 @@ import java.util.List;
 //import cz.msebera.android.httpclient.Header;
 
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements PostsFragment.OnItemSelectedListener {
     /**
      * Day 1. Created the Home activity using the popular.json
      * Day 2. Instead of using a prepopulated file get the real data. Use Instagram popular feeds api
@@ -52,6 +54,8 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
       //  FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
       //  ft.replace(R.id.your_placeholder, new PostsFragment());
@@ -62,8 +66,12 @@ public class HomeActivity extends AppCompatActivity {
         viewPager.setAdapter(new HomeFragmentStatePagerAdapter(getSupportFragmentManager(),
                 HomeActivity.this));
 
+
         // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        tabLayout.setFitsSystemWindows(true);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.setupWithViewPager(viewPager);
 
     }
@@ -151,5 +159,17 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onProfilePicItemSelected(String userId) {
+        FragmentTransaction fts;
+       // Log.i("PRAJ clicked user id", mPosts.get(position).user.userName);
+        fts = getSupportFragmentManager().beginTransaction();
+      //  fts = getChildFragmentManager().beginTransaction();
+        ProfileFragment pfFragment = ProfileFragment.newInstance(userId);
+        fts.addToBackStack("posts");
+        fts.replace(R.id.viewpager, pfFragment);
+        fts.commit();
     }
 }

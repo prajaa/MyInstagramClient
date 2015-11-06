@@ -6,7 +6,10 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
@@ -26,6 +29,8 @@ import android.widget.TextView;
 import com.codepath.instagram.R;
 import com.codepath.instagram.activities.CommentsActivity;
 import com.codepath.instagram.activities.HomeActivity;
+import com.codepath.instagram.fragments.PostsFragment;
+import com.codepath.instagram.fragments.ProfileFragment;
 import com.codepath.instagram.helpers.Utils;
 import com.codepath.instagram.models.InstagramComment;
 import com.codepath.instagram.models.InstagramPost;
@@ -52,11 +57,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
     List<InstagramPost> mPosts;
     Context context;
+    Fragment mFragment;
 
 
 
-    public PostsAdapter() {
+    public PostsAdapter(Fragment fragment) {
         mPosts = new ArrayList<InstagramPost>();
+        mFragment = fragment;
     }
 
     @Override
@@ -266,6 +273,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             tvTime = (TextView) layoutView.findViewById(R.id.tvTime);
             mainImage = (SimpleDraweeView) layoutView.findViewById(R.id.my_image_view);
             profileImage = (SimpleDraweeView) layoutView.findViewById(R.id.ivUserProfile);
+            profileImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getLayoutPosition();
+                    getUserId(position, v);
+                }
+            });
             llComents = (LinearLayout) layoutView.findViewById(R.id.llcomments);
             tvViewAllComment = (TextView) layoutView.findViewById(R.id.tvViewAllComments);
             ibShare = (ImageButton) layoutView.findViewById(R.id.ibShare);
@@ -291,6 +305,19 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             context.startActivity(intent);
 
         }
+    }
+
+    private void getUserId(int position, View v) {
+        String userId = mPosts.get(position).user.userId;
+       /* PostsFragment fragment = (PostsFragment)mFragment;
+        fragment.listener.onProfilePicItemSelected(userId);*/
+        FragmentTransaction fts;
+        Log.i("PRAJ clicked user id", mPosts.get(position).user.userName);
+        fts = mFragment.getFragmentManager().beginTransaction();
+        ProfileFragment pfFragment = ProfileFragment.newInstance(userId);
+        fts.addToBackStack("posts");
+        fts.replace(R.id.ll_tabs, pfFragment);
+        fts.commit();
     }
 
 

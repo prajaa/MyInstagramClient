@@ -26,6 +26,13 @@ public class InstagramClient extends OAuthBaseClient {
     public static final String SELF_FEED_URL = "users/self/feed";
     public static final String USER_SEARCH_FEED_URL = "users/search?q=";
     public static final String TAG_SEARCH_FEED_URL = "tags/search?q=";
+    public static final String SEARCH_FEED_URL = "search?q=";
+    public static final String USERS = "users/";
+    public static final String TAGS = "tags/";
+    public static final String PHOTO_FEED_URL = "/media/recent/";
+    public static final String FOLLOWING_FEEL_URL = "/follows";
+    public static final String FOLLOWERS_FEED_URL = "/followed-by";
+
     public static final String REST_URL = "https://api.instagram.com/v1/";
 
 
@@ -53,10 +60,10 @@ public class InstagramClient extends OAuthBaseClient {
 
     }
 
-    public void getSelfFeed(JsonHttpResponseHandler responseHandler) {
+    public void getSelfFeed(String url, JsonHttpResponseHandler responseHandler) {
         RequestParams params = new RequestParams();
         params.put("access_token", client.getAccessToken().getToken());
-        mSyncClient.get(REST_URL + SELF_FEED_URL, params, responseHandler);
+        mSyncClient.get(url, params, responseHandler);
        // client.get(REST_URL + SELF_FEED_URL, params, responseHandler);
         //client.get(REST_URL + SELF_FEED_URL, null, responseHandler);
     }
@@ -64,20 +71,43 @@ public class InstagramClient extends OAuthBaseClient {
     public void getCommentsFeed(JsonHttpResponseHandler responseHandler, String mediaId) {
         mMediaId = mediaId;
         String api = REST_URL +mMediaId+COMMENTS_FEED_URL+CLIENT_ID;
-        Log.i("COMMENTS_ACTIVITY", "Getting the comments Feed "+api);
+        Log.i("COMMENTS_ACTIVITY", "Getting the comments Feed " + api);
         client.get(api, null, responseHandler);
     }
 
     public void getUserSearchFeed(JsonHttpResponseHandler responseHandler, String searchTerm) {
-        String api = REST_URL + USER_SEARCH_FEED_URL + searchTerm;
+        String api = REST_URL + USERS + SEARCH_FEED_URL + searchTerm;
         client.get(api, null, responseHandler);
     }
 
     public void getTagSearchFeed(JsonHttpResponseHandler responseHandler, String searchTerm) {
-        String api = REST_URL + TAG_SEARCH_FEED_URL + searchTerm;
+        String api = REST_URL + TAGS + SEARCH_FEED_URL + searchTerm;
         client.get(api, null, responseHandler);
     }
 
+    public void getUsersPhotoFeed(JsonHttpResponseHandler responseHandler, String userId) {
+        String api = REST_URL + USERS + userId + PHOTO_FEED_URL;
+       // Log.i("PROFILE", api);
+        client.get(api, null, responseHandler);
+    }
+
+    public void getTagsPhotoFeed(JsonHttpResponseHandler responseHandler, String tagId) {
+        String api = REST_URL + TAGS + tagId + PHOTO_FEED_URL;
+       // Log.i("PROFILE", api);
+        client.get(api, null, responseHandler);
+    }
+
+    public void getFollowersFeed(JsonHttpResponseHandler responseHandler, String userId) {
+        String api = REST_URL + USERS + userId + FOLLOWERS_FEED_URL;
+      //  Log.i("PROFILE", api);
+        client.get(api, null, responseHandler);
+    }
+
+    public void getFollowingFeed(JsonHttpResponseHandler responseHandler, String userId) {
+        String api = REST_URL + USERS + userId + FOLLOWING_FEEL_URL;
+       // Log.i("PROFILE", api);
+        client.get(api, null, responseHandler);
+    }
 
 
 }

@@ -13,4 +13,7 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="users">USERS</string>
     <string name="tags">TAGS</string>
+    <string name="posts">posts</string>
+    <string name="followers">followers</string>
+    <string name="following">following</string>
 </resources>

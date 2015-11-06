@@ -11,6 +11,7 @@ import android.text.style.ImageSpan;
 
 import com.codepath.instagram.R;
 import com.codepath.instagram.fragments.PostsFragment;
+import com.codepath.instagram.fragments.ProfileFragment;
 import com.codepath.instagram.fragments.SearchFragment;
 import com.codepath.instagram.fragments.SearchResultUserFragment;
 import com.codepath.instagram.fragments.SearchResultsTagFragment;
@@ -52,6 +53,8 @@ public class HomeFragmentStatePagerAdapter extends SmartFragmentStatePagerAdapte
 
         Class fragmentClass = null;
 
+        boolean profilePage = false;
+
         switch(position) {
             case 0:
                 fragmentClass = PostsFragment.class;
@@ -59,13 +62,20 @@ public class HomeFragmentStatePagerAdapter extends SmartFragmentStatePagerAdapte
             case 1:
                 fragmentClass = SearchFragment.class;
                 break;
+            case 4:
+                profilePage = true;
+                fragmentClass = ProfileFragment.class;
+                break;
             default:
                 fragmentClass = PostsFragment.class;
                 break;
 
         }
         try {
-            fragment = (Fragment) fragmentClass.newInstance();
+            if (profilePage)
+                fragment = ProfileFragment.newInstance("self");
+            else
+                fragment = (Fragment) fragmentClass.newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.codepath.instagram.PostsService;
 import com.codepath.instagram.R;
 import com.codepath.instagram.adapter.PostsAdapter;
+import com.codepath.instagram.helpers.EndlessScrollListener;
 import com.codepath.instagram.helpers.InstagramClient;
 import com.codepath.instagram.helpers.SimpleVerticalSpacerItemDecoration;
 import com.codepath.instagram.helpers.Utils;
@@ -50,8 +51,14 @@ public class PostsFragment extends Fragment {
     SwipeRefreshLayout swipeContainer;
     PostsAdapter postsAdapter;
     InstagramClientDatabase instagramClientDatabase;// = InstagramClientDatabase.getInstance(mContext);
+    String mNextUrl;
 
 
+    public OnItemSelectedListener listener;
+
+    public interface OnItemSelectedListener {
+        public void onProfilePicItemSelected(String userId);
+    }
 
     @Nullable
     @Override
@@ -65,15 +72,35 @@ public class PostsFragment extends Fragment {
         mContext = context;
         instagramClientDatabase = InstagramClientDatabase.getInstance(context);
         super.onAttach(context);
+        if (context instanceof OnItemSelectedListener) {
+            listener = (OnItemSelectedListener) context;
+        } else {
+            throw new ClassCastException(context.toString()
+                    + " must implement MyListFragment.OnItemSelectedListener");
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         fView = view;
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
-        postsAdapter = new PostsAdapter();
+        postsAdapter = new PostsAdapter(this);
+        postsAdapter.clear();
 
         RecyclerView rvPosts = (RecyclerView) view.findViewById(R.id.rvPosts);
+        rvPosts.addOnScrollListener(new EndlessScrollListener() {
+
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                customLoadMoreDataFromApi(page);
+                return true;
+            }
+        });
         SimpleVerticalSpacerItemDecoration rvSeparation = new SimpleVerticalSpacerItemDecoration(24);
         rvPosts.addItemDecoration(rvSeparation);
         rvPosts.setAdapter(postsAdapter);
@@ -96,6 +123,17 @@ public class PostsFragment extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
     }
+
+    public void customLoadMoreDataFromApi(int offset) {
+        // This method probably sends out a network request and appends new data items to your adapter.
+        // Use the offset value and add it as a parameter to your API request to retrieve paginated data.
+        // Deserialize API response and then construct new objects to append to the adapter
+        Intent i = new Intent(mContext, PostsService.class);
+        i.putExtra(PostsService.INTENT_URL, mNextUrl);
+        mContext.startService(i);
+
+    }
+
 
     @Override
     public void onResume() {
@@ -128,11 +166,13 @@ public class PostsFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             if (intent.getIntExtra(PostsService.INTENT_STATUS_CODE, 0) == 200) {
                 String response = intent.getStringExtra(PostsService.INTENT_DATA);
-                postsAdapter.clear();
+               // postsAdapter.clear();
                 try {
                     JSONObject resp = new JSONObject(response);
                     posts = Utils.decodePostsFromJsonResponse(resp);
+                    mNextUrl = InstagramPost.nextUrl(resp);
                     postsAdapter.addAll(posts);
+
                     swipeContainer.setRefreshing(false);
                     instagramClientDatabase.emptyAllTables();
                     instagramClientDatabase.addInstagramPosts(posts);

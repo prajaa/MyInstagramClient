@@ -46,7 +46,7 @@ public class PostsService extends IntentService {
         mContext = this;
         if (intent != null & intent.hasExtra(INTENT_URL)) {
             InstagramClient client = ((MainApplication) this.getApplication()).getInstagramClient();
-            client.getSelfFeed(new JsonHttpResponseHandler() {
+            client.getSelfFeed(intent.getStringExtra(INTENT_URL), new JsonHttpResponseHandler() {
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
@@ -69,7 +69,7 @@ public class PostsService extends IntentService {
                     broadcast.putExtra(INTENT_STATUS_CODE, statusCode);
                     broadcast.putExtra(INTENT_DATA, response.toString());
                     LocalBroadcastManager.getInstance(mContext).sendBroadcast(broadcast);
-                    Log.d(LOG_TAG, "onSuccess");
+                    Log.d("PRAJ", "onSuccess Posts Data "+response.toString());
                 }
 
 

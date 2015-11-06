@@ -26,6 +26,17 @@ public class InstagramPost implements Serializable {
         comments.add(comment);
     }
 
+    public static String nextUrl(JSONObject response) {
+        String nextUrl = "";
+        try {
+            JSONObject pagination = response.getJSONObject("pagination");
+            nextUrl = pagination.getString("next_url");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return nextUrl;
+    }
+
     public static InstagramPost fromJson(JSONObject jsonObject) {
         if (jsonObject == null) {
             return null;
